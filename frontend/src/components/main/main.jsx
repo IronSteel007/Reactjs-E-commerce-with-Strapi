@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   Dialog,
   IconButton,
@@ -20,9 +21,15 @@ import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutl
 import { Close } from "@mui/icons-material";
 import ProductDetails from "./ProductDetails";
 import { useGetproductByNameQuery } from "../../Redux/product";
+
+import LinearProgress from '@mui/material/LinearProgress';
+
 const Main = () => {
   const handleAlignment = (event, newValue) => {
-    setmyDate(newValue);
+    if (newValue !== null) {
+      setmyDate(newValue);
+    }
+
   };
 
   const theme = useTheme();
@@ -42,24 +49,32 @@ const Main = () => {
 
   const [myDate, setmyDate] = useState(allProductsAPI);
   const { data, error, isLoading } = useGetproductByNameQuery(myDate);
-
+  const [clickedProduct, setclickedProduct] = useState({});
   if (data) {
     console.log(data.data);
   }
 
   if (isLoading) {
-    return <Typography variant="h6">LOADING..............</Typography>;
+    return (
+      <Stack sx={{ width: '100%', textAlign: "center" , color: 'grey.500' }} spacing={2}>
+      <LinearProgress color="secondary" />
+      <LinearProgress color="success" />
+      <LinearProgress color="inherit" />
+    </Stack>
+    );
   }
 
   if (error) {
     return (
-      <Typography variant="h6">
-        {" "}
-        {
-          // @ts-ignore
-          error.message
-        }
-      </Typography>
+      <Container sx={{ py: 11, textAlign:"center" }}>
+        <Typography variant="h6">
+          {error.error}
+        </Typography>
+
+        <Typography variant="h6">
+        Please try again later
+        </Typography>
+      </Container>
     );
   }
 
@@ -131,7 +146,7 @@ const Main = () => {
           {data.data.map((item) => {
             return (
               <Card
-                key={item}
+                key={item.id}
                 sx={{
                   maxWidth: 333,
                   mt: 6,
@@ -173,7 +188,10 @@ const Main = () => {
 
                 <CardActions sx={{ justifyContent: "space-between" }}>
                   <Button
-                    onClick={handleClickOpen}
+                    onClick={(params) => {
+                      handleClickOpen()
+                      setclickedProduct(item)
+                    }}
                     sx={{ textTransform: "capitalize" }}
                     size="large"
                   >
